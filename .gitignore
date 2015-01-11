@@ -8,11 +8,7 @@
 /test/tmp/
 /test/version_tmp/
 /tmp/
-
-## Specific to RubyMotion:
-.dat*
-.repl_history
-build/
+Gemfile.lock
 
 ## Documentation cache and generated files:
 /.yardoc/
