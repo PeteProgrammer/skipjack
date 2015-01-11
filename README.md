@@ -1,6 +1,6 @@
 # Skipjack
 
-TODO: Write a gem description
+Rake commands for building .NET code
 
 ## Installation
 

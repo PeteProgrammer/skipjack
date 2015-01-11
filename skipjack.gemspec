@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Skipjack::VERSION
   spec.authors       = ["Peter Strøiman"]
   spec.email         = ["peter@stroiman.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.description   = %q{Rake commands for building .NET code}
+  spec.summary       = %q{Rake commands for building .NET code}
   spec.homepage      = ""
   spec.license       = "MIT"
 
