@@ -4,6 +4,13 @@ describe 'fsharp' do
     Rake.application = @app
   end
 
+  context "when a task is not executed" do
+    it "does not call the system" do
+      expect(Kernel).to_not receive(:system)
+      @task = fsc :build 
+    end
+  end
+
   context "when running on windows" do
     before :each do
       allow(@app).to receive("windows?").and_return true
@@ -14,8 +21,7 @@ describe 'fsharp' do
         expect(args).to eq "fsc"
         true
       end
-      @task = fsc :build do
-      end
+      @task = fsc :build
       @task.invoke()
     end
   end
@@ -30,8 +36,7 @@ describe 'fsharp' do
         expect(args).to eq "mono fsharpc"
         true
       end
-      @task = fsc :build do
-      end
+      @task = fsc :build 
       @task.invoke()
     end
   end
