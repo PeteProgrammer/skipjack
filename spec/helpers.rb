@@ -6,7 +6,12 @@ module Helpers
 
   def expect_system_call 
     expect(Kernel).to receive(:system) do |args|
-      yield args
+      result = yield args
+      if result.nil? then
+        true
+      else
+        result
+      end
     end
   end
 

@@ -29,4 +29,16 @@ describe 'fsharp' do
       invoke_fsc_task
     end
   end
+
+  describe "target type" do
+    context "is a library" do
+      it "adds --target:library" do
+        expect_system_call do |cmd|
+          args = cmd.split
+          args.shift
+        end
+        invoke_fsc_task
+      end
+    end
+  end
 end
