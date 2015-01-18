@@ -1,10 +1,15 @@
 module Skipjack
   class FSharpCompiler
-    attr_accessor :target
+    attr_reader :target
 
     def initialize *args
       @args = *args
       yield self if block_given?
+    end
+
+    def target=(val)
+      raise "Invalid target: #{val}" unless %w(exe winexe library module).include? val.to_s
+      @target = val
     end
 
     def create_task

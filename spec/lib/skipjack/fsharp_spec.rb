@@ -7,6 +7,7 @@ describe 'fsharp' do
     windows = example.metadata[:windows]
     windows = true if windows.nil? #default to true as this is a simpler case (no mono prefix)
     allow(@app).to receive("windows?").and_return windows
+    allow(Kernel).to receive(:system).and_return true
   end
 
   context "when a task is not executed" do
@@ -50,6 +51,14 @@ describe 'fsharp' do
       invoke_fsc_task do |t|
         t.target = :exe
       end
+    end
+    it "fails when using invalid target option" do
+      op = lambda do
+        invoke_fsc_task do |t|
+          t.target = :invalid_option
+        end
+      end
+      expect(op).to raise_error
     end
   end
 end
