@@ -5,6 +5,6 @@ def fsc *args, &block
     else
       cmd = "mono fsharpc"
     end
-    raise "Error executing command" unless Kernel.system cmd
+    raise "Error executing command" unless Kernel.system "#{cmd} "
   end
 end
