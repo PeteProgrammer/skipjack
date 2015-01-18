@@ -3,7 +3,7 @@ def fsc *args, &block
     if t.application.windows?
       cmd = "fsc"
     else
-      cmd = "mono fsharpc"
+      cmd = "fsharpc"
     end
     raise "Error executing command" unless Kernel.system "#{cmd} "
   end
