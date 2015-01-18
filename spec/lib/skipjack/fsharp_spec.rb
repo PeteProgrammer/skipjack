@@ -17,21 +17,23 @@ describe 'fsharp' do
     end
   end
 
-  context "when running on windows", windows: true do
-    it 'calls "mono fsc"' do
-      expect_compiler_call do |opts|
-        expect(opts.executable).to eq "fsc"
-      end
+  describe "command line args" do
+    let :options do
+      expect_compiler_call { |opts| @opts = opts }
       invoke_fsc_task
+      @opts
     end
-  end
 
-  context "when running on non-windows", windows: false do
-    it 'calls "mono fsc"' do
-      expect_compiler_call do |opts|
-        expect(opts.executable).to eq "fsharpc"
+    describe "called executable" do
+      subject { options.executable }
+
+      context "when running on windows", windows: true do
+        it { should eq "fsc" }
       end
-      invoke_fsc_task
+
+      context "when running on non-windows", windows: false do
+        it { should eq "fsharpc" }
+      end
     end
   end
 
