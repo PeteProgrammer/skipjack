@@ -18,14 +18,18 @@ describe 'fsharp' do
 
   context "when running on windows", windows: true do
     it 'calls "mono fsc"' do
-      expect_system_call { |cmd| expect(cmd).to start_with "fsc " }
+      expect_compiler_call do |opts|
+        expect(opts.executable).to eq "fsc"
+      end
       invoke_fsc_task
     end
   end
 
   context "when running on non-windows", windows: false do
     it 'calls "mono fsc"' do
-      expect_system_call { |cmd| expect(cmd).to start_with "fsharpc " }
+      expect_compiler_call do |opts|
+        expect(opts.executable).to eq "fsharpc"
+      end
       invoke_fsc_task
     end
   end
