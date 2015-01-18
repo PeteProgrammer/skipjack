@@ -20,7 +20,9 @@ describe 'fsharp' do
   describe "command line args" do
     let :options do
       expect_compiler_call { |opts| @opts = opts }
-      invoke_fsc_task
+      invoke_fsc_task do |t|
+        @setup.call(t) if @setup
+      end
       @opts
     end
 
@@ -35,25 +37,27 @@ describe 'fsharp' do
         it { should eq "fsharpc" }
       end
     end
+
+    describe "--target: argument" do
+      before do |ex|
+        @setup = lambda do |t|
+          t.target = ex.metadata[:target]
+        end
+      end
+
+      subject { options.target }
+
+      context "when target = :library", target: :library do
+        it { should eq "library" }
+      end
+
+      context "when target = :exe", target: :exe do
+        it { should eq "exe" }
+      end
+    end
   end
 
   describe "target type" do
-    it "adds --target:library to library code" do
-      expect_compiler_call do |opts|
-        expect(opts.target).to eq "library"
-      end
-      invoke_fsc_task do |t|
-        t.target = :library
-      end
-    end
-    it "adds --target:exe to library exe" do
-      expect_compiler_call do |opts|
-        expect(opts.target).to eq "exe"
-      end
-      invoke_fsc_task do |t|
-        t.target = :exe
-      end
-    end
     it "fails when using invalid target option" do
       op = lambda do
         invoke_fsc_task do |t|
