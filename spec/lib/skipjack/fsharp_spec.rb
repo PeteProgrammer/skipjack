@@ -33,4 +33,23 @@ describe 'fsharp' do
       invoke_fsc_task
     end
   end
+
+  describe "target type" do
+    it "adds --target:library to library code" do
+      expect_compiler_call do |opts|
+        expect(opts.target).to eq "library"
+      end
+      invoke_fsc_task do |t|
+        t.target = :library
+      end
+    end
+    it "adds --target:exe to library exe" do
+      expect_compiler_call do |opts|
+        expect(opts.target).to eq "exe"
+      end
+      invoke_fsc_task do |t|
+        t.target = :exe
+      end
+    end
+  end
 end

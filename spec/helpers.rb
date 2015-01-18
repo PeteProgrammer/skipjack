@@ -6,7 +6,12 @@ module Helpers
 
   def expect_system_call 
     expect(Kernel).to receive(:system) do |args|
-      yield args
+      result = yield args
+      if result.nil? then
+        true
+      else
+        result
+      end
     end
   end
 
@@ -22,7 +27,7 @@ module Helpers
   end
 
   class CompilerOptions
-    attr_accessor :executable
+    attr_accessor :executable, :target
 
     def initialize
       yield self if block_given?
@@ -34,8 +39,12 @@ module Helpers
     executable = args[0]
     args.shift
 
+
     CompilerOptions.new do |c|
       c.executable = executable
+      /--target:(\w*)/.match(cmd) do |m|
+        c.target = m[1]
+      end
     end
   end
 end
