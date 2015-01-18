@@ -1,43 +1,32 @@
 describe 'fsharp' do
-  before :each do
+  before :each do |example|
     @app = Rake::Application.new
     Rake.application = @app
+
+    # mock if we are running windows or not
+    windows = example.metadata[:windows]
+    windows = true if windows.nil? #default to true as this is a simpler case (no mono prefix)
+    allow(@app).to receive("windows?").and_return windows
   end
 
   context "when a task is not executed" do
     it "does not call the system" do
-      expect(Kernel).to_not receive(:system)
+      expect_no_system_call
       @task = fsc :build 
     end
   end
 
-  context "when running on windows" do
-    before :each do
-      allow(@app).to receive("windows?").and_return true
-    end
-
+  context "when running on windows", windows: true do
     it 'calls "mono fsc"' do
-      expect(Kernel).to receive(:system) do |args|
-        expect(args).to eq "fsc"
-        true
-      end
-      @task = fsc :build
-      @task.invoke()
+      expect_system_call { |cmd| expect(cmd).to eq "fsc" }
+      invoke_fsc_task
     end
   end
 
-  context "when running on non-windows" do
-    before :each do
-      allow(@app).to receive("windows?").and_return false
-    end
-
+  context "when running on non-windows", windows: false do
     it 'calls "mono fsc"' do
-      expect(Kernel).to receive(:system) do |args|
-        expect(args).to eq "mono fsharpc"
-        true
-      end
-      @task = fsc :build 
-      @task.invoke()
+      expect_system_call { |cmd| expect(cmd).to eq "mono fsharpc" }
+      invoke_fsc_task
     end
   end
 end
