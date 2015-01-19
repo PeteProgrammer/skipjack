@@ -5,8 +5,9 @@ describe 'fsharp' do
 
     # mock if we are running windows or not
     windows = example.metadata[:windows]
-    windows = true if windows.nil? #default to true as this is a simpler case (no mono prefix)
+    windows = true if windows.nil?
     allow(@app).to receive("windows?").and_return windows
+
     allow(Kernel).to receive(:system).and_return true
   end
 
