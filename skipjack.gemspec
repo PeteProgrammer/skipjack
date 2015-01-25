@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = Skipjack::VERSION
   spec.authors       = ["Peter Strøiman"]
   spec.email         = ["peter@stroiman.com"]
-  spec.description   = %q{Rake commands for building .NET code}
-  spec.summary       = %q{Rake commands for building .NET code}
-  spec.homepage      = ""
+  spec.description   = %q{A collection of Rake commands for compiling .NET code wihtout dependency to project files or msbuils scripts.}
+  spec.summary       = %q{Build .NET code with Rake}
+  spec.homepage      = "https://github.com/PeteProgrammer/skipjack"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
