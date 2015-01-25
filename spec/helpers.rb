@@ -28,9 +28,14 @@ module Helpers
 
   class CompilerOptions
     attr_accessor :executable, :target
+    attr_writer :source_files
 
     def initialize
       yield self if block_given?
+    end
+
+    def source_files
+      @source_files ||= []
     end
   end
 
@@ -39,12 +44,13 @@ module Helpers
     executable = args[0]
     args.shift
 
-
     CompilerOptions.new do |c|
       c.executable = executable
       /--target:(\w*)/.match(cmd) do |m|
         c.target = m[1]
       end
+
+      c.source_files = args.select { |f| f[0] != '-' }
     end
   end
 end

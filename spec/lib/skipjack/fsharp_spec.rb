@@ -19,8 +19,11 @@ describe 'fsharp' do
   end
 
   describe "command line args" do
-    let :options do
+    before :each do 
       expect_compiler_call { |opts| @opts = opts }
+    end
+
+    let :options do
       invoke_fsc_task do |t|
         @setup.call(t) if @setup
       end
@@ -54,6 +57,16 @@ describe 'fsharp' do
 
       context "when target = :exe", target: :exe do
         it { should eq "exe" }
+      end
+    end
+
+    describe "source files" do
+      it "contains the passed sources" do
+        sources = ["source1.fs", "source2.fs"]
+        @setup = lambda do |t|
+          t.source_files = sources
+        end
+        expect(options.source_files).to eq(sources)
       end
     end
   end

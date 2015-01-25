@@ -12,6 +12,14 @@ module Skipjack
       @target = val
     end
 
+    def source_files=(val)
+      @source_files = val
+    end
+
+    def source_files
+      @source_files ||= []
+    end
+
     def create_task
       Rake::Task::define_task *@args do |t|
         if t.application.windows?
@@ -20,7 +28,8 @@ module Skipjack
           compiler = "fsharpc"
         end
 
-        cmd = "#{compiler} --target:#{target.to_s}"
+        src = source_files.join(" ")
+        cmd = "#{compiler} --target:#{target.to_s} #{src}"
         raise "Error executing command" unless Kernel.system cmd
       end
     end
