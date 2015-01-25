@@ -1,6 +1,7 @@
 module Skipjack
   class FSharpCompiler
     attr_reader :target
+    attr_accessor :output_folder, :output_file
 
     def initialize *args
       @args = *args
@@ -28,8 +29,9 @@ module Skipjack
           compiler = "fsharpc"
         end
 
+        out = output_folder ? "--out:#{output_folder}/#{output_file}" : "--out:#{output_file}"
         src = source_files.join(" ")
-        cmd = "#{compiler} --target:#{target.to_s} #{src}"
+        cmd = "#{compiler} #{out} --target:#{target.to_s} #{src}"
         raise "Error executing command" unless Kernel.system cmd
       end
     end

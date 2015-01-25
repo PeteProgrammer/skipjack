@@ -27,7 +27,7 @@ module Helpers
   end
 
   class CompilerOptions
-    attr_accessor :executable, :target
+    attr_accessor :executable, :target, :out
     attr_writer :source_files
 
     def initialize
@@ -48,6 +48,10 @@ module Helpers
       c.executable = executable
       /--target:(\w*)/.match(cmd) do |m|
         c.target = m[1]
+      end
+
+      %r{--out:([\w\./]*)}.match(cmd) do |m|
+        c.out = m[1]
       end
 
       c.source_files = args.select { |f| f[0] != '-' }

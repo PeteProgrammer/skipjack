@@ -69,6 +69,25 @@ describe 'fsharp' do
         expect(options.source_files).to eq(sources)
       end
     end
+
+    describe "output" do
+      it "sets the output file" do
+        @setup = lambda do |t|
+          t.output_folder = "f"
+          t.output_file = "p.exe"
+        end
+        expect(options.out).to eq("f/p.exe")
+      end
+    end
+
+    context "when folder not specified" do
+      it "sets the output file" do
+        @setup = lambda do |t|
+          t.output_file = "p.exe"
+        end
+        expect(options.out).to eq("p.exe")
+      end
+    end
   end
 
   describe "target type" do
