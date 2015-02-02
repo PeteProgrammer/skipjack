@@ -22,18 +22,24 @@ module Skipjack
     end
 
     def create_task
-      Rake::Task::define_task *@args do |t|
+      task = Rake::Task::define_task *@args 
+
+      output_file_name = output_folder ? "#{output_folder}/#{output_file}" : output_file
+      dependencies = source_files
+      file_task = Rake::FileTask::define_task output_file_name => dependencies do |t|
         if t.application.windows?
           compiler = "fsc"
         else
           compiler = "fsharpc"
         end
 
-        out = output_folder ? "--out:#{output_folder}/#{output_file}" : "--out:#{output_file}"
+        out = "--out:#{output_file_name}"
         src = source_files.join(" ")
         cmd = "#{compiler} #{out} --target:#{target.to_s} #{src}"
         raise "Error executing command" unless Kernel.system cmd
       end
+
+      task.enhance [file_task]
     end
   end
 end

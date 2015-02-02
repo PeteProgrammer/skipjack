@@ -1,5 +1,13 @@
+#require 'fakefs/safe'
+require 'fakefs/spec_helpers'
+
+
 describe 'fsharp' do
+  include FakeFS::SpecHelpers
+
   before :each do |example|
+    #FakeFS.activate!
+    #FileSystem.clear
     @app = Rake::Application.new
     Rake.application = @app
 
@@ -10,6 +18,10 @@ describe 'fsharp' do
 
     allow(Kernel).to receive(:system).and_return true
   end
+
+  #after :each do
+    #FakeFS.deactivate!
+  #end
 
   context "when a task is not executed" do
     it "does not call the system" do
@@ -25,6 +37,7 @@ describe 'fsharp' do
 
     let :options do
       invoke_fsc_task do |t|
+        t.output_file = "dummy.exe" # in case test doesn't set one up
         @setup.call(t) if @setup
       end
       @opts
@@ -63,6 +76,8 @@ describe 'fsharp' do
     describe "source files" do
       it "contains the passed sources" do
         sources = ["source1.fs", "source2.fs"]
+        FileUtils.touch "source1.fs"
+        FileUtils.touch "source2.fs"
         @setup = lambda do |t|
           t.source_files = sources
         end
@@ -86,6 +101,33 @@ describe 'fsharp' do
           t.output_file = "p.exe"
         end
         expect(options.out).to eq("p.exe")
+      end
+    end
+
+    describe "build optimization" do
+      context "build output is older than source files" do
+        it "does not call the compiler", :focus => true do
+          FileUtils.touch('./p.exe')
+          FileUtils.touch('s.fs')
+          @setup = lambda do |t|
+            t.target = :exe
+            t.output_file = "p.exe"
+            t.source_files = ["s.fs"]
+          end
+          expect(options).to_not be_nil
+        end
+      end
+      context "build output is newer than source files" do
+        it "does not call the compiler", :focus => true do
+          FileUtils.touch('s.fs')
+          FileUtils.touch('./p.exe')
+          @setup = lambda do |t|
+            t.target = :exe
+            t.output_file = "p.exe"
+            t.source_files = ["s.fs"]
+          end
+          expect(options).to be_nil
+        end
       end
     end
   end
