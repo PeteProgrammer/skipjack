@@ -21,9 +21,7 @@ module Skipjack
       @source_files ||= []
     end
 
-    def create_task
-      task = Rake::Task::define_task *@args 
-
+    def create_file_task
       output_file_name = output_folder ? "#{output_folder}/#{output_file}" : output_file
       dependencies = source_files
       file_task = Rake::FileTask::define_task output_file_name => dependencies do |t|
@@ -38,7 +36,11 @@ module Skipjack
         cmd = "#{compiler} #{out} --target:#{target.to_s} #{src}"
         raise "Error executing command" unless Kernel.system cmd
       end
+    end
 
+    def create_task
+      task = Rake::Task::define_task *@args 
+      file_task = create_file_task
       task.enhance [file_task]
     end
   end
