@@ -1,1 +1,2 @@
+Version 0.0.2: Skip compilation if target is newer than sources
 Version 0.0.1: Compile F# source files
