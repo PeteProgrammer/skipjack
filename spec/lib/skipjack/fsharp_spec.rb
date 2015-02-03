@@ -1,4 +1,3 @@
-#require 'fakefs/safe'
 require 'fakefs/spec_helpers'
 
 
@@ -6,8 +5,6 @@ describe 'fsharp' do
   include FakeFS::SpecHelpers
 
   before :each do |example|
-    #FakeFS.activate!
-    #FileSystem.clear
     @app = Rake::Application.new
     Rake.application = @app
 
@@ -18,10 +15,6 @@ describe 'fsharp' do
 
     allow(Kernel).to receive(:system).and_return true
   end
-
-  #after :each do
-    #FakeFS.deactivate!
-  #end
 
   context "when a task is not executed" do
     it "does not call the system" do
