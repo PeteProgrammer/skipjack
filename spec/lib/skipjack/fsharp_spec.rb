@@ -5,8 +5,7 @@ describe 'fsharp' do
   include FakeFS::SpecHelpers
 
   before :each do |example|
-    @app = Rake::Application.new
-    Rake.application = @app
+    @app = Rake.application = Rake::Application.new
 
     # mock if we are running windows or not
     windows = example.metadata[:windows]
