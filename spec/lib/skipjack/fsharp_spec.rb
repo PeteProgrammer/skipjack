@@ -98,7 +98,7 @@ describe 'fsharp' do
 
     describe "build optimization" do
       context "build output is older than source files" do
-        it "does not call the compiler", :focus => true do
+        it "calls the compiler", :focus => true do
           FileUtils.touch('./p.exe')
           FileUtils.touch('s.fs')
           @setup = lambda do |t|
