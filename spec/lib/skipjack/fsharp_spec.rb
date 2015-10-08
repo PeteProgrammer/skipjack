@@ -1,6 +1,5 @@
 require 'fakefs/spec_helpers'
 
-
 describe 'fsharp' do
   include FakeFS::SpecHelpers
 
@@ -45,6 +44,18 @@ describe 'fsharp' do
       context "when running on non-windows", windows: false do
         it { should eq "fsharpc" }
       end
+    end
+
+    describe "--reference: argument" do
+      before do |ex|
+        @setup = lambda do |t|
+          t.references = ["ref1.dll", "ref2.dll"]
+        end
+      end
+
+      subject { options.references }
+
+      it { should eq ["ref1.dll", "ref2.dll"] }
     end
 
     describe "--target: argument" do

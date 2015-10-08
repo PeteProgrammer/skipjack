@@ -2,6 +2,7 @@ module Skipjack
   class FSharpCompiler
     attr_reader :target
     attr_accessor :output_folder, :output_file
+    attr_writer :references
 
     def initialize *args
       @args = *args
@@ -21,6 +22,10 @@ module Skipjack
       @source_files ||= []
     end
 
+    def references
+      @references ||= []
+    end
+
     def create_file_task
       output_file_name = output_folder ? "#{output_folder}/#{output_file}" : output_file
       dependencies = source_files
@@ -33,7 +38,9 @@ module Skipjack
 
         out = "--out:#{output_file_name}"
         src = source_files.join(" ")
-        cmd = "#{compiler} #{out} --target:#{target.to_s} #{src}"
+        refs = references.each {|r| r.prepend("--reference:") }
+        refs = refs.join(" ")
+        cmd = "#{compiler} #{refs} #{out} --target:#{target.to_s} #{src}"
         raise "Error executing command" unless Kernel.system cmd
       end
     end

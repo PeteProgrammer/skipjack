@@ -29,6 +29,7 @@ module Helpers
   class CompilerOptions
     attr_accessor :executable, :target, :out
     attr_writer :source_files
+    attr_writer :references
 
     def initialize
       yield self if block_given?
@@ -36,6 +37,10 @@ module Helpers
 
     def source_files
       @source_files ||= []
+    end
+
+    def references
+      @reference ||= []
     end
   end
 
@@ -52,6 +57,10 @@ module Helpers
 
       %r{--out:([\w\./]*)}.match(cmd) do |m|
         c.out = m[1]
+      end
+
+      cmd.scan(/--reference:([^ ]*)/) do |m|
+        c.references << m[0]
       end
 
       c.source_files = args.select { |f| f[0] != '-' }
