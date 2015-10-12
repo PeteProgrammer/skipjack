@@ -142,7 +142,7 @@ describe 'fsharp' do
           t.target = :invalid_option
         end
       end
-      expect(op).to raise_error
+      expect(op).to raise_error(/^Invalid target/)
     end
   end
 end
