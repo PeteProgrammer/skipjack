@@ -1,7 +1,6 @@
 module Skipjack
   class FSharpCompiler
     attr_reader :target
-    attr_accessor :output_folder, :output_file
     attr_writer :references
 
     def initialize *args
@@ -26,29 +25,27 @@ module Skipjack
       @references ||= []
     end
 
-    def create_file_task
-      output_file_name = output_folder ? "#{output_folder}/#{output_file}" : output_file
+    def create_file_task *args
       dependencies = source_files
-      file_task = Rake::FileTask::define_task output_file_name => dependencies do |t|
+      file_task = Rake::FileTask::define_task *args do |t|
         if t.application.windows?
           compiler = "fsc"
         else
           compiler = "fsharpc"
         end
 
-        out = "--out:#{output_file_name}"
+        out = "--out:#{t.name}"
         src = source_files.join(" ")
         refs = references.each {|r| r.prepend("--reference:") }
         refs = refs.join(" ")
         cmd = "#{compiler} #{refs} #{out} --target:#{target.to_s} #{src}"
         raise "Error executing command" unless Kernel.system cmd
       end
+      file_task.enhance dependencies
     end
 
     def create_task
-      task = Rake::Task::define_task *@args 
-      file_task = create_file_task
-      task.enhance [file_task]
+      create_file_task *@args
     end
   end
 end

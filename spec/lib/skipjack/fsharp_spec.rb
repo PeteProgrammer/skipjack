@@ -17,20 +17,22 @@ describe 'fsharp' do
   context "when a task is not executed" do
     it "does not call the system" do
       expect_no_system_call
-      @task = fsc :build 
+      @task = fsc "dummy.exe"
     end
   end
 
   describe "command line args" do
     before :each do 
-      expect_compiler_call { |opts| @opts = opts }
+      expect_compiler_call do |opts|
+        @opts = opts 
+      end
     end
 
     let :options do
-      invoke_fsc_task do |t|
-        t.output_file = "dummy.exe" # in case test doesn't set one up
+      task = fsc "dummy.exe" do |t|
         @setup.call(t) if @setup
       end
+      task.invoke
       @opts
     end
 
@@ -90,20 +92,11 @@ describe 'fsharp' do
 
     describe "output" do
       it "sets the output file" do
-        @setup = lambda do |t|
-          t.output_folder = "f"
-          t.output_file = "p.exe"
+        task = fsc "f/p.exe" do |t|
+          @setup.call(t) if @setup
         end
-        expect(options.out).to eq("f/p.exe")
-      end
-    end
-
-    context "when folder not specified" do
-      it "sets the output file" do
-        @setup = lambda do |t|
-          t.output_file = "p.exe"
-        end
-        expect(options.out).to eq("p.exe")
+        task.invoke
+        expect(@opts.out).to eq("f/p.exe")
       end
     end
 
@@ -112,24 +105,24 @@ describe 'fsharp' do
         it "calls the compiler", :focus => true do
           FileUtils.touch('./p.exe')
           FileUtils.touch('s.fs')
-          @setup = lambda do |t|
+          task = fsc "p.exe" do |t|
             t.target = :exe
-            t.output_file = "p.exe"
             t.source_files = ["s.fs"]
           end
-          expect(options).to_not be_nil
+          task.invoke
+          expect(@opts).to_not be_nil
         end
       end
       context "build output is newer than source files" do
         it "does not call the compiler", :focus => true do
           FileUtils.touch('s.fs')
           FileUtils.touch('./p.exe')
-          @setup = lambda do |t|
+          task = fsc "p.exe" do |t|
             t.target = :exe
-            t.output_file = "p.exe"
             t.source_files = ["s.fs"]
           end
-          expect(options).to be_nil
+          task.invoke
+          expect(@opts).to be_nil
         end
       end
     end
@@ -138,7 +131,7 @@ describe 'fsharp' do
   describe "target type" do
     it "fails when using invalid target option" do
       op = lambda do
-        invoke_fsc_task do |t|
+        task = fsc "p.exe" do |t|
           t.target = :invalid_option
         end
       end
