@@ -1,8 +1,7 @@
 module Skipjack
   class FSharpCompiler
     attr_reader :target
-    attr_writer :references
-    attr_accessor :copy_references
+    attr_writer :references, :local_refs
     attr_accessor :resident
 
     def initialize *args
@@ -26,6 +25,15 @@ module Skipjack
 
     def references
       @references ||= []
+    end
+
+    def local_refs
+      @local_refs ||= []
+    end
+
+    def add_reference(ref, copy_local: false)
+      references << ref
+      local_refs << ref if copy_local
     end
 
     def create_file_task *args
@@ -54,14 +62,12 @@ module Skipjack
     end
 
     def add_reference_dependencies(task)
-      if copy_references
-        references.each do |r|
-          dest = File.join(File.dirname(task.name), File.basename(r))
-          reference_task = Rake::FileTask::define_task dest => [r] do |t|
-            FileUtils.cp(t.prerequisites[0], t.name)
-          end
-          task.enhance [reference_task] unless dest == r
+      local_refs.each do |r|
+        dest = File.join(File.dirname(task.name), File.basename(r))
+        reference_task = Rake::FileTask::define_task dest => [r] do |t|
+          FileUtils.cp(t.prerequisites[0], t.name)
         end
+        task.enhance [reference_task] unless dest == r
       end
     end
 

@@ -151,25 +151,34 @@ describe 'fsharp' do
         end
       end
 
+      it "does not copy the source file to the destination folder by default" do
+          FileUtils.mkdir('input', 'output')
+          FileUtils.touch('input/x.dll')
+          task = fsc "output/p.exe" do |t|
+            t.target = :exe
+            t.add_reference 'input/x.dll'
+          end
+          task.invoke
+          expect(File.file?('output/x.dll')).to be false
+      end
+
       it "copies the source file to the destination folder" do
           FileUtils.mkdir('input', 'output')
           FileUtils.touch('input/x.dll')
           task = fsc "output/p.exe" do |t|
             t.target = :exe
-            t.copy_references = true
-            t.references << 'input/x.dll'
+            t.add_reference 'input/x.dll', copy_local: true
           end
           task.invoke
           expect(File.file?('output/x.dll')).to be true
       end
 
-      it "doesnt fail if file is already in destination folder" do
+      it "doesnt copy if copy_local is false" do
           FileUtils.mkdir('output')
           FileUtils.touch('output/x.dll')
           task = fsc "output/p.exe" do |t|
             t.target = :exe
-            t.copy_references = true
-            t.references << 'output/x.dll'
+            t.add_reference 'input/x.dll', copy_local: false
           end
           task.invoke
           op = lambda { task.invoke }
