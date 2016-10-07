@@ -2,9 +2,11 @@ module Skipjack
   class FSharpCompiler
     attr_reader :target
     attr_writer :references
+    attr_accessor :resident
 
     def initialize *args
       @args = *args
+      self.resident = true #default value
       yield self if block_given?
     end
 
@@ -38,6 +40,9 @@ module Skipjack
         opts << "--out:#{t.name}"
         opts << "--target:#{target.to_s}"
         references.each { |r| opts << "--reference:#{r}" }
+        if resident
+          opts << "--resident"
+        end
 
         cmd = "#{compiler} #{opts.join(" ")} #{source_files.join(" ")}"
         raise "Error executing command" unless Kernel.system cmd

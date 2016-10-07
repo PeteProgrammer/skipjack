@@ -60,6 +60,30 @@ describe 'fsharp' do
       it { should eq ["ref1.dll", "ref2.dll"] }
     end
 
+    describe "--resident" do
+      before do |ex|
+        @setup = lambda do |t|
+          t.resident = ex.metadata[:resident] unless ex.metadata[:resident].nil?
+        end
+      end
+
+      subject { options.resident }
+
+      context "resident is not set" do
+        it "defaults to true" do
+          expect(subject).to eq true
+        end
+      end
+
+      context "resident set to true", resident: true do
+        it { should eq true }
+      end
+
+      context "resident set to false", resident: false do
+        it { should eq false }
+      end
+    end
+
     describe "--target: argument" do
       before do |ex|
         @setup = lambda do |t|

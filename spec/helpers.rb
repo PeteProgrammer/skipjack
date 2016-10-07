@@ -28,6 +28,7 @@ module Helpers
 
   class CompilerOptions
     attr_accessor :executable, :target, :out
+    attr_accessor :resident
     attr_writer :source_files
     attr_writer :references
 
@@ -50,6 +51,7 @@ module Helpers
     args.shift
 
     CompilerOptions.new do |c|
+      c.resident = false
       c.executable = executable
       /--target:(\w*)/.match(cmd) do |m|
         c.target = m[1]
@@ -57,6 +59,10 @@ module Helpers
 
       %r{--out:([\w\./]*)}.match(cmd) do |m|
         c.out = m[1]
+      end
+
+      %r{--resident}.match(cmd) do
+        c.resident = true
       end
 
       cmd.scan(/--reference:([^ ]*)/) do |m|
