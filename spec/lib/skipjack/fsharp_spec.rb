@@ -152,18 +152,28 @@ describe 'fsharp' do
       end
 
       it "copies the source file to the destination folder" do
-          FileUtils.touch('s.fs')
-          FileUtils.mkdir('input')
-          FileUtils.mkdir('output')
+          FileUtils.mkdir('input', 'output')
           FileUtils.touch('input/x.dll')
           task = fsc "output/p.exe" do |t|
             t.target = :exe
-            t.source_files = ["s.fs"]
             t.copy_references = true
             t.references << 'input/x.dll'
           end
           task.invoke
           expect(File.file?('output/x.dll')).to be true
+      end
+
+      it "doesnt fail if file is already in destination folder" do
+          FileUtils.mkdir('output')
+          FileUtils.touch('output/x.dll')
+          task = fsc "output/p.exe" do |t|
+            t.target = :exe
+            t.copy_references = true
+            t.references << 'output/x.dll'
+          end
+          task.invoke
+          op = lambda { task.invoke }
+          expect(op).to_not raise_error
       end
     end
   end

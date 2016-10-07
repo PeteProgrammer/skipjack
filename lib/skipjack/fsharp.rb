@@ -60,7 +60,7 @@ module Skipjack
           reference_task = Rake::FileTask::define_task dest => [r] do |t|
             FileUtils.cp(t.prerequisites[0], t.name)
           end
-          task.enhance [reference_task]
+          task.enhance [reference_task] unless dest == r
         end
       end
     end
