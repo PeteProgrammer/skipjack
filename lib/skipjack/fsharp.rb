@@ -34,11 +34,12 @@ module Skipjack
           compiler = "fsharpc"
         end
 
-        out = "--out:#{t.name}"
-        src = source_files.join(" ")
-        refs = references.each {|r| r.prepend("--reference:") }
-        refs = refs.join(" ")
-        cmd = "#{compiler} #{refs} #{out} --target:#{target.to_s} #{src}"
+        opts = []
+        opts << "--out:#{t.name}"
+        opts << "--target:#{target.to_s}"
+        references.each { |r| opts << "--reference:#{r}" }
+
+        cmd = "#{compiler} #{opts.join(" ")} #{source_files.join(" ")}"
         raise "Error executing command" unless Kernel.system cmd
       end
       file_task.enhance dependencies
