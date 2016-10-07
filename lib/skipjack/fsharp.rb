@@ -51,22 +51,24 @@ module Skipjack
         raise "Error executing command" unless Kernel.system cmd
       end
       file_task.enhance dependencies
+    end
+
+    def add_reference_dependencies(task)
       if copy_references
         references.each do |r|
-          dir = File.dirname(file_task.name)
-          name = File.join(dir, File.basename(r))
-
-          reference_task = Rake::FileTask::define_task name do
-            FileUtils.cp(r, name)
+          dest = File.join(File.dirname(task.name), File.basename(r))
+          reference_task = Rake::FileTask::define_task dest => [r] do |t|
+            FileUtils.cp(t.prerequisites[0], t.name)
           end
-          file_task.enhance [reference_task]
+          task.enhance [reference_task]
         end
       end
-      return file_task
     end
 
     def create_task
-      create_file_task *@args
+      task = create_file_task *@args
+      add_reference_dependencies(task)
+      task
     end
   end
 end
