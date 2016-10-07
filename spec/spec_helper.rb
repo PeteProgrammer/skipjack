@@ -1,3 +1,6 @@
+# require 'pp' early, because it gets implicitly required later, and it
+# messes with FakeFS if FakeFS is not required last.
+require 'pp'
 require 'skipjack'
 require 'rake'
 require_relative 'helpers'
