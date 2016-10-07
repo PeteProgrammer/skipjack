@@ -126,7 +126,7 @@ describe 'fsharp' do
 
     describe "build optimization" do
       context "build output is older than source files" do
-        it "calls the compiler", :focus => true do
+        it "calls the compiler" do
           FileUtils.touch('./p.exe')
           FileUtils.touch('s.fs')
           task = fsc "p.exe" do |t|
@@ -137,8 +137,9 @@ describe 'fsharp' do
           expect(@opts).to_not be_nil
         end
       end
+
       context "build output is newer than source files" do
-        it "does not call the compiler", :focus => true do
+        it "does not call the compiler" do
           FileUtils.touch('s.fs')
           FileUtils.touch('./p.exe')
           task = fsc "p.exe" do |t|
@@ -148,6 +149,21 @@ describe 'fsharp' do
           task.invoke
           expect(@opts).to be_nil
         end
+      end
+
+      it "copies the source file to the destination folder" do
+          FileUtils.touch('s.fs')
+          FileUtils.mkdir('input')
+          FileUtils.mkdir('output')
+          FileUtils.touch('input/x.dll')
+          task = fsc "output/p.exe" do |t|
+            t.target = :exe
+            t.source_files = ["s.fs"]
+            t.copy_references = true
+            t.references << 'input/x.dll'
+          end
+          task.invoke
+          expect(File.file?('output/x.dll')).to be true
       end
     end
   end

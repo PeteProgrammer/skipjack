@@ -2,6 +2,7 @@ module Skipjack
   class FSharpCompiler
     attr_reader :target
     attr_writer :references
+    attr_accessor :copy_references
     attr_accessor :resident
 
     def initialize *args
@@ -44,10 +45,24 @@ module Skipjack
           opts << "--resident"
         end
 
+        dir = File.dirname(t.name)
+
         cmd = "#{compiler} #{opts.join(" ")} #{source_files.join(" ")}"
         raise "Error executing command" unless Kernel.system cmd
       end
       file_task.enhance dependencies
+      if copy_references
+        references.each do |r|
+          dir = File.dirname(file_task.name)
+          name = File.join(dir, File.basename(r))
+
+          reference_task = Rake::FileTask::define_task name do
+            FileUtils.cp(r, name)
+          end
+          file_task.enhance [reference_task]
+        end
+      end
+      return file_task
     end
 
     def create_task
