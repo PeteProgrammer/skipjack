@@ -86,20 +86,48 @@ describe 'fsharp' do
   end
 
   describe "--target: argument" do
-    before do |ex|
-      @opts = invoke_fsc do |t|
-        t.target = ex.metadata[:target]
+    describe "output file is an .dll file" do
+      before do |ex|
+        @opts = invoke_fsc "dummy.dll" do |t|
+          t.target = ex.metadata[:target] unless ex.metadata[:target].nil?
+        end
+      end
+
+      subject { @opts.target }
+
+      context "when target not set" do
+        it { should eq "library" }
+      end
+
+      context "when target = :library", target: :library do
+        it { should eq "library" }
+      end
+
+      context "when target = :exe", target: :exe do
+        it { should eq "exe" }
       end
     end
 
-    subject { @opts.target }
+    describe "output file is an .exe file" do
+      before do |ex|
+        @opts = invoke_fsc "dummy.exe" do |t|
+          t.target = ex.metadata[:target] unless ex.metadata[:target].nil?
+        end
+      end
 
-    context "when target = :library", target: :library do
-      it { should eq "library" }
-    end
+      subject { @opts.target }
 
-    context "when target = :exe", target: :exe do
-      it { should eq "exe" }
+      context "when target not set" do
+        it { should eq "exe" }
+      end
+
+      context "when target = :library", target: :library do
+        it { should eq "library" }
+      end
+
+      context "when target = :exe", target: :exe do
+        it { should eq "exe" }
+      end
     end
   end
 

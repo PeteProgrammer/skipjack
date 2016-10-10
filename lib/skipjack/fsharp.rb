@@ -45,6 +45,13 @@ module Skipjack
           compiler = "fsharpc"
         end
 
+        target = self.target
+        case File.extname(t.name) 
+        when ".exe"
+          target = :exe 
+        when ".dll"
+          target = :library 
+        end unless target
         opts = []
         opts << "--out:#{t.name}"
         opts << "--target:#{target.to_s}"
