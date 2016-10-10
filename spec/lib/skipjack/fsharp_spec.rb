@@ -14,7 +14,7 @@ describe 'fsharp' do
     allow(Kernel).to receive(:system).and_return true
   end
 
-  context "when a task is not executed" do
+  context "when a task is not invoked" do
     it "does not call the system" do
       expect_no_system_call
       @task = fsc "dummy.exe"
