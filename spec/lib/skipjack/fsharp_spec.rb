@@ -1,10 +1,16 @@
 require 'fakefs/spec_helpers'
 
 def invoke_fsc *args, &block
+  opts = nil
+  expect_compiler_call do |o|
+    opts = o
+  end
+  args = ["dummy.exe"] if args == []
   task = fsc *args do |t|
     yield t if block_given?
   end
   task.invoke
+  opts
 end
 
 describe 'fsharp' do
@@ -29,17 +35,11 @@ describe 'fsharp' do
   end
 
   describe "command line args" do
-    before :each do 
-      expect_compiler_call do |opts|
-        @opts = opts 
-      end
-    end
-
     describe "called executable" do
-      before :each do 
-        invoke_fsc "dummy.exe"
+      subject do
+        opts = invoke_fsc
+        opts.executable
       end
-      subject { @opts.executable }
 
       context "when running on windows", windows: true do
         it { should eq "fsc" }
@@ -52,7 +52,7 @@ describe 'fsharp' do
 
     describe "--reference: argument" do
       before do |ex|
-        invoke_fsc "dummy.exe" do |t|
+        @opts = invoke_fsc do |t|
           t.references = ["ref1.dll", "ref2.dll"]
         end
       end
@@ -64,7 +64,7 @@ describe 'fsharp' do
 
     describe "--resident" do
       before do |ex|
-        invoke_fsc "dummy.exe" do |t|
+        @opts = invoke_fsc do |t|
           t.resident = ex.metadata[:resident] unless ex.metadata[:resident].nil?
         end
       end
@@ -88,7 +88,7 @@ describe 'fsharp' do
 
     describe "--target: argument" do
       before do |ex|
-        invoke_fsc "dummy.exe" do |t|
+        @opts = invoke_fsc do |t|
           t.target = ex.metadata[:target]
         end
       end
@@ -109,7 +109,7 @@ describe 'fsharp' do
         sources = ["source1.fs", "source2.fs"]
         FileUtils.touch "source1.fs"
         FileUtils.touch "source2.fs"
-        invoke_fsc "dummy.exe" do |t|
+        @opts = invoke_fsc do |t|
           t.source_files = sources
         end
         expect(@opts.source_files).to eq(sources)
@@ -118,9 +118,8 @@ describe 'fsharp' do
 
     describe "output" do
       it "sets the output file" do
-        task = fsc "f/p.exe" do |t|
+        @opts = invoke_fsc "f/p.exe" do |t|
         end
-        task.invoke
         expect(@opts.out).to eq("f/p.exe")
       end
     end
@@ -130,11 +129,10 @@ describe 'fsharp' do
         it "calls the compiler" do
           FileUtils.touch('./p.exe')
           FileUtils.touch('s.fs')
-          task = fsc "p.exe" do |t|
+          @opts = invoke_fsc "p.exe" do |t|
             t.target = :exe
             t.source_files = ["s.fs"]
           end
-          task.invoke
           expect(@opts).to_not be_nil
         end
       end
@@ -143,11 +141,10 @@ describe 'fsharp' do
         it "does not call the compiler" do
           FileUtils.touch('s.fs')
           FileUtils.touch('./p.exe')
-          task = fsc "p.exe" do |t|
+          @opts = invoke_fsc "p.exe" do |t|
             t.target = :exe
             t.source_files = ["s.fs"]
           end
-          task.invoke
           expect(@opts).to be_nil
         end
       end
