@@ -1,5 +1,12 @@
 require 'fakefs/spec_helpers'
 
+def invoke_fsc *args, &block
+  task = fsc *args do |t|
+    yield t if block_given?
+  end
+  task.invoke
+end
+
 describe 'fsharp' do
   include FakeFS::SpecHelpers
 
@@ -28,16 +35,11 @@ describe 'fsharp' do
       end
     end
 
-    let :options do
-      task = fsc "dummy.exe" do |t|
-        @setup.call(t) if @setup
-      end
-      task.invoke
-      @opts
-    end
-
     describe "called executable" do
-      subject { options.executable }
+      before :each do 
+        invoke_fsc "dummy.exe"
+      end
+      subject { @opts.executable }
 
       context "when running on windows", windows: true do
         it { should eq "fsc" }
@@ -50,24 +52,24 @@ describe 'fsharp' do
 
     describe "--reference: argument" do
       before do |ex|
-        @setup = lambda do |t|
+        invoke_fsc "dummy.exe" do |t|
           t.references = ["ref1.dll", "ref2.dll"]
         end
       end
 
-      subject { options.references }
+      subject { @opts.references }
 
       it { should eq ["ref1.dll", "ref2.dll"] }
     end
 
     describe "--resident" do
       before do |ex|
-        @setup = lambda do |t|
+        invoke_fsc "dummy.exe" do |t|
           t.resident = ex.metadata[:resident] unless ex.metadata[:resident].nil?
         end
       end
 
-      subject { options.resident }
+      subject { @opts.resident }
 
       context "resident is not set" do
         it "defaults to true" do
@@ -86,12 +88,12 @@ describe 'fsharp' do
 
     describe "--target: argument" do
       before do |ex|
-        @setup = lambda do |t|
+        invoke_fsc "dummy.exe" do |t|
           t.target = ex.metadata[:target]
         end
       end
 
-      subject { options.target }
+      subject { @opts.target }
 
       context "when target = :library", target: :library do
         it { should eq "library" }
@@ -107,17 +109,16 @@ describe 'fsharp' do
         sources = ["source1.fs", "source2.fs"]
         FileUtils.touch "source1.fs"
         FileUtils.touch "source2.fs"
-        @setup = lambda do |t|
+        invoke_fsc "dummy.exe" do |t|
           t.source_files = sources
         end
-        expect(options.source_files).to eq(sources)
+        expect(@opts.source_files).to eq(sources)
       end
     end
 
     describe "output" do
       it "sets the output file" do
         task = fsc "f/p.exe" do |t|
-          @setup.call(t) if @setup
         end
         task.invoke
         expect(@opts.out).to eq("f/p.exe")
