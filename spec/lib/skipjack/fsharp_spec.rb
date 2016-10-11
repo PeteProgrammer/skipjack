@@ -1,18 +1,5 @@
 require 'fakefs/spec_helpers'
 
-def invoke_fsc *args, &block
-  opts = nil
-  expect_compiler_call do |o|
-    opts = o
-  end
-  args = ["dummy.exe"] if args == []
-  task = fsc *args do |t|
-    yield t if block_given?
-  end
-  task.invoke
-  opts
-end
-
 describe 'fsharp' do
   include FakeFS::SpecHelpers
 
@@ -221,4 +208,17 @@ describe "target type" do
     end
     expect(op).to raise_error(/^Invalid target/)
   end
+end
+
+def invoke_fsc *args, &block
+  opts = nil
+  expect_compiler_call do |o|
+    opts = o
+  end
+  args = ["dummy.exe"] if args == []
+  task = fsc *args do |t|
+    yield t if block_given?
+  end
+  task.invoke
+  opts
 end
