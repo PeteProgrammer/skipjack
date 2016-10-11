@@ -72,6 +72,19 @@ describe 'fsharp' do
     end
   end
 
+  describe "additional arguments" do
+    it "allows the caller to add extra arguments" do
+      args = ""
+      expect_system_call do |a|
+        args = a
+      end
+      task = fsc "dummy.exe" do |t|
+        t.add_argument "--extra"
+      end
+      task.invoke
+      expect(args).to match(/ --extra\b/)
+    end
+  end
   describe "--target: argument" do
     describe "output file is an .dll file" do
       before do |ex|

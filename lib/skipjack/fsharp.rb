@@ -36,6 +36,11 @@ module Skipjack
       local_refs << ref if copy_local
     end
 
+    def add_argument arg
+      @added_arguments ||= []
+      @added_arguments << arg
+    end
+
     def create_file_task *args
       dependencies = source_files
       file_task = Rake::FileTask::define_task *args do |t|
@@ -55,6 +60,7 @@ module Skipjack
         opts = []
         opts << "--out:#{t.name}"
         opts << "--target:#{target.to_s}"
+        @added_arguments.each { |a| opts << a } if @added_arguments
         references.each { |r| opts << "--reference:#{r}" }
         if resident
           opts << "--resident"
