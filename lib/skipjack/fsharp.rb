@@ -63,6 +63,7 @@ module Skipjack
         dir = File.dirname(t.name)
 
         cmd = "#{compiler} #{opts.join(" ")} #{source_files.join(" ")}"
+        puts cmd
         raise "Error executing command" unless Kernel.system cmd
       end
       file_task.enhance dependencies
